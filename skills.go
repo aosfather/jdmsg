@@ -65,6 +65,7 @@ func (this *SkillService) GetMessages(deviceId string) []Msg {
 			fmt.Println(i, "=", v.Name())
 		}
 	}
+	fmt.Println(deviceId, " msg not found!")
 	return nil
 }
 
