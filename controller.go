@@ -77,7 +77,7 @@ func (this *AlphaController) getMessages(deviId string) string {
 		rmsg := fmt.Sprintf("您有%d条留言。", len(msgs))
 
 		for index, msg := range msgs {
-			rmsg += fmt.Sprintf("第%d条:%s。", index+1, msg)
+			rmsg += fmt.Sprintf("第%d条:%s对你说:%s。", index+1, msg.From, msg.Data)
 		}
 
 		return rmsg

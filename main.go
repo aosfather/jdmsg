@@ -10,8 +10,8 @@ func main() {
 
 func loadService(context *bingo.ApplicationContext) bool {
 	ss := SkillService{}
-	ss.aliasPath = ""
-	ss.msgPath = ""
+	ss.aliasPath = context.GetPropertyFromConfig("jdmsg.path")
+	ss.msgPath = context.GetPropertyFromConfig("jdmsg.path")
 	context.RegisterService("skill", &ss)
 
 	return true

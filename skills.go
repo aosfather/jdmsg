@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 /**
@@ -28,14 +29,19 @@ func (this *SkillService) getAliasFileName(alias string) string {
 }
 
 func (this *SkillService) getMsgDirectory(deviceId string) string {
-	return fmt.Sprint("%s/%s/", this.msgPath, deviceId)
+	return fmt.Sprintf("%s/%s/", this.msgPath, deviceId)
 }
 
 //通过别名获取设备id
 func (this *SkillService) GetDeviceIdByAlias(alias string) string {
 	fp := this.getAliasFileName(alias)
 	if PathExists(fp) {
-		data, _ := ioutil.ReadFile(fp)
+		fmt.Println("exist ", alias)
+		data, err := ioutil.ReadFile(fp)
+		if err != nil {
+			fmt.Println("error:%s", err.Error())
+		}
+		fmt.Println(data)
 		return string(data)
 	}
 
@@ -46,7 +52,7 @@ func (this *SkillService) GetDeviceIdByAlias(alias string) string {
 func (this *SkillService) CreateAlias(alias string, deviceId string) bool {
 	fp := this.getAliasFileName(alias)
 	if !PathExists(fp) {
-		ioutil.WriteFile(fp, []byte(deviceId), os.ModeAppend)
+		ioutil.WriteFile(fp, []byte(deviceId), 0666)
 		return true
 	}
 	return false
@@ -61,9 +67,21 @@ func (this *SkillService) GetMessages(deviceId string) []Msg {
 			fmt.Println("read dir error")
 			return nil
 		}
+		result := []Msg{}
 		for i, v := range dir_list {
 			fmt.Println(i, "=", v.Name())
+			msg := Msg{}
+			content, e := ioutil.ReadFile(pathname + "/" + v.Name())
+			if e != nil {
+				fmt.Println(e.Error())
+			}
+			msg.Data = string(content)
+			msg.From = strings.Replace(v.Name(), ".msg", "", 1)
+			msg.To = deviceId
+			result = append(result, msg)
 		}
+
+		return result
 	}
 	fmt.Println(deviceId, " msg not found!")
 	return nil
@@ -73,7 +91,10 @@ func (this *SkillService) SendMessage(fromDeviceId string, toAlias string, msg s
 	deviceId := this.GetDeviceIdByAlias(toAlias)
 	if deviceId != "" {
 		pathname := this.getMsgDirectory(deviceId)
-		ioutil.WriteFile(pathname+fromDeviceId+".msg", []byte(msg), os.ModeAppend)
+		if !PathExists(pathname) {
+			fmt.Println(os.Mkdir(pathname, os.ModePerm))
+		}
+		ioutil.WriteFile(pathname+fromDeviceId+".msg", []byte(msg), 0666)
 
 	}
 }
