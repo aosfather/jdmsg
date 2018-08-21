@@ -35,7 +35,7 @@ func (this *AlphaController) Post(c mvc.Context, p interface{}) (interface{}, mv
 		res.Response.Output.Type = "PlainText"
 		if value.Request.Type == "LaunchRequest" {
 
-			res.Response.Output.Text = "欢迎使用我的留言！"
+			res.Response.Output.Text = "欢迎使用我的留言！在使用的时候需要先绑定一个手机号，例如你可以说绑定13600，来绑定13600的手机号，这样其它人就可以通过13600来给你留言了；可以对我说获取留言，来查收其它给你的留言。最后你可以对我说给手机号说你想说的话，来给指定的手机号留言，例如给13600说你好棒，这样13600的用户就可以收到你好棒的留言了。玩的愉快！"
 
 		} else if value.Request.Type == "IntentRequest" {
 			name := value.Request.Intent.Name
