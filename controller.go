@@ -60,6 +60,9 @@ func (this *AlphaController) bindMobile(deviId string, intent _intent) string {
 	slot := intent.Slots["mobile"]
 	if slot.ConfirmResult == "CONFIRMED" && slot.Matched {
 		mobile := slot.Value
+		if len(mobile) < 11 {
+			return "请输入11位的手机号"
+		}
 		if this.Skill.CreateAlias(mobile, deviId) {
 			return "绑定成功"
 		}
