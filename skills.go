@@ -28,6 +28,10 @@ func (this *SkillService) getAliasFileName(alias string) string {
 	return fmt.Sprintf("%s/%s.alias", this.aliasPath, alias)
 }
 
+func (this *SkillService) getProfileFileName(devId string) string {
+	return fmt.Sprintf("%s/%s.profile", this.aliasPath, devId)
+}
+
 func (this *SkillService) getMsgDirectory(deviceId string) string {
 	return fmt.Sprintf("%s/%s/", this.msgPath, deviceId)
 }
@@ -48,10 +52,47 @@ func (this *SkillService) GetDeviceIdByAlias(alias string) string {
 	return ""
 }
 
+func (this *SkillService) GetAliasByDeviceId(devId string) string {
+	fp := this.getProfileFileName(devId)
+	if PathExists(fp) {
+		fmt.Println("exist ", devId)
+		data, err := ioutil.ReadFile(fp)
+		if err != nil {
+			fmt.Println("error:%s", err.Error())
+		}
+		fmt.Println(data)
+		return string(data)
+	}
+
+	return ""
+}
+
+//删除别名，
+func (this *SkillService) DestoryAlias(alias string, deviceId string) bool {
+	targetId := this.GetDeviceIdByAlias(alias)
+	if deviceId != targetId {
+		return false
+	}
+
+	fp := this.getAliasFileName(alias)
+	pfile := this.getProfileFileName(deviceId)
+	if PathExists(fp) {
+
+		ioutil.WriteFile(pfile, []byte(""), 0666)
+		os.Remove(fp)
+
+	}
+
+	return true
+
+}
+
 //创建别名，如果别名存在则创建失败
 func (this *SkillService) CreateAlias(alias string, deviceId string) bool {
 	fp := this.getAliasFileName(alias)
+	pfile := this.getProfileFileName(deviceId)
 	if !PathExists(fp) {
+		ioutil.WriteFile(pfile, []byte(alias), 0666)
 		ioutil.WriteFile(fp, []byte(deviceId), 0666)
 		return true
 	}
